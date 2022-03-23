@@ -13,6 +13,7 @@ type Block struct {
 	Data          []byte // 区块的数据内容
 	PrevBlockHash []byte // 上一个区块的哈希值，用以组成链
 	Hash          []byte // 当前区块的哈希值，用以校验区块数据有效性
+	Nonce         int    // 表示工作量
 }
 
 // 创建一个新的区块
@@ -22,11 +23,15 @@ func NewBlock(date string, PrevBlockHash []byte) (block *Block) {
 		Data:          []byte(date),      // 内容
 		PrevBlockHash: PrevBlockHash,     // 上个区块的哈希
 	}
-	block.setHash() // 添加当前区块的哈希
+	pow := NewProofofWork(block) // 获取工作量证明的句柄
+	nonce, hash := pow.Run()     // 执行获取工作量证明
+	block.Nonce = nonce          // 将工作量存入区块
+	block.Hash = hash[:]         // 添加当前区块的哈希
+	// block.setHash()           // 添加当前区块的哈希（不含工作量）
 	return block
 }
 
-// 为区块添加哈希
+// 为区块添加哈希（不含工作量）
 func (b *Block) setHash() {
 	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
 	headers := bytes.Join([][]byte{b.PrevBlockHash, b.Data, timestamp}, []byte{})
