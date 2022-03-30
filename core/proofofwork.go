@@ -28,6 +28,7 @@ func NewProofofWork(b *Block) *ProofofWork {
 	return pow
 }
 
+// 工作量计算
 func (pow *ProofofWork) prepareData(nonce int) []byte {
 	data := bytes.Join(
 		[][]byte{
@@ -67,4 +68,17 @@ func (pow *ProofofWork) Run() (int, []byte) {
 	}
 	fmt.Println()
 	return nonce, hash[:]
+}
+
+// 工作量验证
+func (pow *ProofofWork) Validate() bool {
+	var hashInt big.Int
+	// 用区块内记录的计算次数重新计算哈希值
+	data := pow.prepareData(pow.block.Nonce)
+	hash := sha256.Sum256(data)
+	hashInt.SetBytes(hash[:])
+	// 对比目标值
+	isValid := hashInt.Cmp(pow.target) == -1
+	// 如果验证成功，则打印成功信息
+	return isValid
 }

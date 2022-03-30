@@ -22,6 +22,8 @@ func main() {
 		fmt.Printf("本块数据：%s\n", block.Data)
 		fmt.Printf("本块哈希：%x\n", block.Hash)
 		fmt.Printf("计算次数：%x\n", strconv.Itoa(block.Nonce)) // 工作量证明转string
+		pow := core.NewProofofWork(block)
+		fmt.Printf("是否有效：%v\n", strconv.FormatBool(pow.Validate()))
 		fmt.Println()
 	}
 }
